@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>force-graph-d3-wrapper example</title>
+  <link rel="stylesheet" href="src/styles/styles.css">
+  <script src="src/js/force-graph-d3-wrapper.js"></script>
+  <script>
+    const loadJSON = (callback) => {   
+
+      var xobj = new XMLHttpRequest()
+      xobj.overrideMimeType("application/json")
+      xobj.open('GET', 'data/data.json', true) // Replace 'my_data' with the path to your file
+      xobj.onreadystatechange = function () {
+        if (xobj.readyState == 4 && xobj.status == "200") {
+          // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+          callback(xobj.responseText)
+        }
+      }
+      xobj.send(null)
+    }
+    const init = () => {
+      loadJSON((response) => {
+        // Parse JSON string into object
+        let jsonData = JSON.parse(response)
+        console.log(jsonData)
+      });
+    }
+    init()
+  </script>
+</head>
+<body>
+  <div class="selector"></div>
+</body>
+</html>
