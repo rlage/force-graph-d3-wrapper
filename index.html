@@ -8,7 +8,9 @@
   <link rel="stylesheet" href="src/styles/styles.css">
   <script src="src/js/force-graph-d3-wrapper.js"></script>
   <script>
-    const loadJSON = (callback) => {   
+    const forceGraphWrapper = new forceGraphD3Wrapper()
+    console.log(forceGraphWrapper)
+    const loadJSON = (callback) => {
 
       var xobj = new XMLHttpRequest()
       xobj.overrideMimeType("application/json")
