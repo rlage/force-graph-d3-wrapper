@@ -1,10 +1,12 @@
-const defaultOptions = {
-  svg : {
-    width: '100%',
-    height: '100%',
-  }
-}
+const defaultOptions = {}
 function forceGraphD3Wrapper(classElement, data, options = defaultOptions) {
+  options = {
+    ...options,
+    svg : {
+      width: '100%',
+      height: '100%',
+    }
+  }
   const svgOptions = options.svg
   let svg = d3.select(`.${classElement}`).append('svg')
   svg.attr('height', svgOptions.height)
@@ -13,7 +15,80 @@ function forceGraphD3Wrapper(classElement, data, options = defaultOptions) {
     data = parseNeo4jD3toD3data(data)
   }
   console.log(data)
+  drawGraph(data)
   return this
+}
+
+const drawGraph = (data) => {
+  const color = d3.scaleOrdinal(d3.schemeCategory20)
+  const svg = d3.select("svg")
+  const svgParent = document.querySelector('svg').parentElement
+
+  console.log(svgParent.offsetWidth)
+  const width = svgParent.offsetWidth,
+    height = svgParent.offsetHeight
+
+  
+
+  var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id }))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(width / 2, height / 2))
+
+    var link = svg.append("g")
+      .attr("class", "relationships")
+      .selectAll("line")
+        .data(data.relationships)
+        .enter().append("line")
+          .attr("stroke-width", function(d) { return Math.sqrt(d.value) })
+
+    var node = svg.append("g")
+      .attr("class", "nodes")
+      .selectAll("circle")
+        .data(data.nodes)
+        .enter().append("circle")
+          .attr("r", 5)
+          .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended))
+
+    node.append("title")
+      .text(function(d) { return d.id })
+
+    simulation
+      .nodes(data.nodes)
+      .on("tick", ticked)
+    simulation.force("link")
+      .links(data.relationships)
+    function ticked() {
+      link
+        .attr("x1", function(d) { return d.source.x })
+        .attr("y1", function(d) { return d.source.y })
+        .attr("x2", function(d) { return d.target.x })
+        .attr("y2", function(d) { return d.target.y })
+
+      node
+        .attr("cx", function(d) { return d.x })
+        .attr("cy", function(d) { return d.y })
+    }
+
+  function dragstarted(d) {
+    if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+    d.fx = d.x
+    d.fy = d.y
+  }
+
+  function dragged(d) {
+    d.fx = d3.event.x
+    d.fy = d3.event.y
+  }
+
+  function dragended(d) {
+    if (!d3.event.active) simulation.alphaTarget(0)
+    d.fx = null
+    d.fy = null
+  }
 }
 
 
