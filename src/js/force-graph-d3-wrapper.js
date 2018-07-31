@@ -24,7 +24,6 @@ const drawGraph = (data) => {
   const svg = d3.select("svg")
   const svgParent = document.querySelector('svg').parentElement
 
-  console.log(svgParent.offsetWidth)
   const width = svgParent.offsetWidth,
     height = svgParent.offsetHeight
 
@@ -40,7 +39,7 @@ const drawGraph = (data) => {
       .selectAll("line")
         .data(data.relationships)
         .enter().append("line")
-          .attr("stroke-width", function(d) { return Math.sqrt(d.value) })
+          .attr("stroke-width", function(d) { return 1 })
 
     var node = svg.append("g")
       .attr("class", "nodes")
@@ -100,7 +99,7 @@ const parseNeo4jD3toD3data = data => {
   data.results.forEach( result => {
     result.data.forEach( data => {
         data.graph.nodes.forEach( node => {
-            if (!parsedData.nodes.includes(node.id)) {
+            if (!contains(parsedData.nodes, node.id)) {
               parsedData.nodes.push(node);
             }
         });
@@ -140,4 +139,12 @@ const parseNeo4jD3toD3data = data => {
   });
 
   return parsedData
+}
+
+const contains = (array, id) => {
+  var filter = array.filter(function(elem) {
+      return elem.id === id;
+  });
+
+  return filter.length > 0;
 }
