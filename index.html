@@ -26,7 +26,13 @@
       loadJSON((response) => {
         // Parse JSON string into object
         let jsonData = JSON.parse(response)
-        const forceGraphWrapper = new forceGraphD3Wrapper('selector', jsonData, {})
+        const forceGraphWrapper = new forceGraphD3Wrapper('selector', jsonData, {
+          "specificNodeRadius": {
+            "pessoa": 50,
+            "empresa": 50,
+          },
+          "generalNodeRadius": 25,
+        })
         console.log(forceGraphWrapper)
       });
     }

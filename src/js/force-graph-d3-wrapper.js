@@ -12,7 +12,8 @@ function forceGraphD3Wrapper(classElement, data, options = defaultOptions) {
   svg.attr('height', svgOptions.height)
   svg.attr('width', svgOptions.width)
   if(data && data.results){
-    data = parseNeo4jD3toD3data(data)
+    console.log(data)
+    data = parseNeo4jD3toD3data(data, options)
   }
   console.log(data)
   drawGraph(data)
@@ -46,7 +47,7 @@ const drawGraph = (data) => {
       .selectAll("circle")
         .data(data.nodes)
         .enter().append("circle")
-          .attr("r", 5)
+          .attr("r", (d) => d.r ? d.r : 25)
           .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
@@ -58,8 +59,13 @@ const drawGraph = (data) => {
     simulation
       .nodes(data.nodes)
       .on("tick", ticked)
+      .force('collide', d3.forceCollide().radius(function(d) {
+        return d.r * 2;
+      }).iterations(2))
+
     simulation.force("link")
       .links(data.relationships)
+
     function ticked() {
       link
         .attr("x1", function(d) { return d.source.x })
@@ -90,8 +96,19 @@ const drawGraph = (data) => {
   }
 }
 
+const getRadius = (node, options) => {
+  const specificNodeRadius = options.specificNodeRadius
+  for (let property in specificNodeRadius) {
+    if (specificNodeRadius.hasOwnProperty(property)) {
+        if (node.labels.includes(property)){
+          return specificNodeRadius[property]
+        }
+    }
+  }
+  return options.generalNodeRadius
+}
 
-const parseNeo4jD3toD3data = data => {
+const parseNeo4jD3toD3data = (data, options) => {
   let parsedData = {
     nodes: [],
     relationships: []
@@ -100,37 +117,38 @@ const parseNeo4jD3toD3data = data => {
     result.data.forEach( data => {
         data.graph.nodes.forEach( node => {
             if (!contains(parsedData.nodes, node.id)) {
-              parsedData.nodes.push(node);
+              node.r = getRadius(node, options)
+              parsedData.nodes.push(node)
             }
         });
 
         data.graph.relationships.forEach( relationship => {
-            relationship.source = relationship.startNode;
-            relationship.target = relationship.endNode;
-            parsedData.relationships.push(relationship);
+            relationship.source = relationship.startNode
+            relationship.target = relationship.endNode
+            parsedData.relationships.push(relationship)
         });
 
         data.graph.relationships.sort((a, b) => {
             if (a.source > b.source) {
-                return 1;
+                return 1
             } else if (a.source < b.source) {
-                return -1;
+                return -1
             } else {
                 if (a.target > b.target) {
-                    return 1;
+                    return 1
                 }
 
                 if (a.target < b.target) {
-                    return -1;
+                    return -1
                 } else {
-                    return 0;
+                    return 0
                 }
             }
-        });
+        })
 
         for (let i = 0; i < data.graph.relationships.length; i++) {
             if (i !== 0 && data.graph.relationships[i].source === data.graph.relationships[i-1].source && data.graph.relationships[i].target === data.graph.relationships[i-1].target) {
-                data.graph.relationships[i].linknum = data.graph.relationships[i - 1].linknum + 1;
+                data.graph.relationships[i].linknum = data.graph.relationships[i - 1].linknum + 1
             } else {
                 data.graph.relationships[i].linknum = 1;
             }
