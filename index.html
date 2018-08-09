@@ -34,7 +34,10 @@
           "generalNodeRadius": 25,
           "onNodeClick": node => {
             console.log(node)
-          }
+          },
+          "onNodeDoubleClick": node => {
+            console.log("dbl click", node)
+          },
         })
         console.log(forceGraphWrapper)
       });

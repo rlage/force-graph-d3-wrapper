@@ -53,6 +53,12 @@ const drawGraph = (data, options) => {
               options.onNodeClick(d);
             }
           })
+          .on('dblclick', function(d) {
+
+            if (typeof options.onNodeDoubleClick === 'function') {
+                options.onNodeDoubleClick(d);
+            }
+          })
           .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
