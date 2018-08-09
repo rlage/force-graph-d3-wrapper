@@ -8,6 +8,12 @@
 }
 
 .nodes circle {
-  stroke: #fff;
+  stroke: black;
+  stroke-width: 1.5px;
+  fill: white;
+}
+
+.nodes circle:hover {
+  stroke: blue;
   stroke-width: 1.5px;
 }
