@@ -16,11 +16,11 @@ function forceGraphD3Wrapper(classElement, data, options = defaultOptions) {
     data = parseNeo4jD3toD3data(data, options)
   }
   console.log(data)
-  drawGraph(data)
+  drawGraph(data, options)
   return this
 }
 
-const drawGraph = (data) => {
+const drawGraph = (data, options) => {
   const color = d3.scaleOrdinal(d3.schemeCategory20)
   const svg = d3.select("svg")
   const svgParent = document.querySelector('svg').parentElement
@@ -48,6 +48,11 @@ const drawGraph = (data) => {
         .data(data.nodes)
         .enter().append("circle")
           .attr("r", (d) => d.r ? d.r : 25)
+          .on('click', d => {
+            if (typeof options.onNodeClick === 'function') {
+              options.onNodeClick(d);
+            }
+          })
           .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
