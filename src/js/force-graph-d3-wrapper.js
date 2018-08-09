@@ -1,5 +1,5 @@
 const defaultOptions = {}
-function forceGraphD3Wrapper(classElement, data, options = defaultOptions) {
+function forceGraphD3Wrapper(selector, data, options = defaultOptions) {
   options = {
     ...options,
     svg : {
@@ -8,9 +8,10 @@ function forceGraphD3Wrapper(classElement, data, options = defaultOptions) {
     }
   }
   const svgOptions = options.svg
-  let svg = d3.select(`.${classElement}`).append('svg')
+  let svg = d3.select(`${selector}`).append('svg')
   svg.attr('height', svgOptions.height)
   svg.attr('width', svgOptions.width)
+  svg.attr('id', 'force-graph-d3-wrapper-svg')
   if(data && data.results){
     console.log(data)
     data = parseNeo4jD3toD3data(data, options)
@@ -22,8 +23,8 @@ function forceGraphD3Wrapper(classElement, data, options = defaultOptions) {
 
 const drawGraph = (data, options) => {
   const color = d3.scaleOrdinal(d3.schemeCategory20)
-  const svg = d3.select("svg")
-  const svgParent = document.querySelector('svg').parentElement
+  const svg = d3.select("#force-graph-d3-wrapper-svg")
+  const svgParent = document.querySelector('#force-graph-d3-wrapper-svg').parentElement
 
   const width = svgParent.offsetWidth,
     height = svgParent.offsetHeight
